@@ -59,7 +59,7 @@ pip install -r requirements.txt
 After setting environment variables, restart your Flask app:
 
 ```bash
-python index.py
+python app.py
 ```
 
 ## Step 6: Test Payments
