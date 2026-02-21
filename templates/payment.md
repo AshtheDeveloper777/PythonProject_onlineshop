@@ -40,7 +40,7 @@ Supports:
 
 3. **Restart the app:**
    ```bash
-   python app.py
+   python index.py
    ```
 
 ### Option B: Use Stripe (International)

@@ -41,7 +41,7 @@ export STRIPE_PUBLISHABLE_KEY="pk_test_your_actual_publishable_key_here"
 After setting the environment variables, restart your Flask app:
 
 ```bash
-python app.py
+python index.py
 ```
 
 ### Step 4: Test Payments
