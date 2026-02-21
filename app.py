@@ -438,7 +438,7 @@ def upload_file():
 # ========================
 # RUN APP
 # ========================
-#if __name__ == "__main__":
+if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         # Create sample products if database is empty
