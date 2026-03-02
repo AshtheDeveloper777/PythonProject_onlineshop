@@ -1,0 +1,1 @@
+from app import app  # 'app' is your Flask instance in app.py
