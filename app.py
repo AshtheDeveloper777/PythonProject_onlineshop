@@ -31,10 +31,12 @@ login_manager.login_view = "login"
 # USER MODEL
 # ========================
 class User(UserMixin, db.Model):
+    __tablename__ = "users"  # match existing Postgres table name
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=False)
-    password_hash = db.Column(db.String(255), nullable=False)
+    # Map ORM attribute 'password_hash' to existing DB column 'password'
+    password_hash = db.Column("password", db.String(255), nullable=False)
 
 
 # ========================
@@ -53,7 +55,7 @@ class Product(db.Model):
 
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey("product.id"), nullable=False)
     quantity = db.Column(db.Integer, default=1)
     product = db.relationship("Product", backref="cart_items")
@@ -61,7 +63,7 @@ class CartItem(db.Model):
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     total_amount = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(20), default="pending")
     shipping_address = db.Column(db.Text, nullable=True)
@@ -153,7 +155,8 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-        if user and check_password_hash(user.password_hash, password):
+        # Safeguard: only check password if a hash is stored
+        if user and user.password_hash and check_password_hash(user.password_hash, password):
             login_user(user)
             return redirect(url_for("index"))
 
@@ -442,16 +445,6 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         # Create sample products if database is empty
-        if Product.query.count() == 0:
-            sample_products = [
-                Product(name="MacBook Pro 16\"", description="Powerful laptop for professionals.", price=2499.99, image_url="https://via.placeholder.com/800x800/1e293b/ffffff?text=MacBook", stock=10, category="Electronics"),
-                Product(name="Wireless Gaming Mouse", description="Ergonomic mouse with RGB lighting.", price=49.99, image_url="https://via.placeholder.com/800x800/1e293b/ffffff?text=Mouse", stock=50, category="Electronics"),
-                Product(name="Mechanical RGB Keyboard", description="Cherry MX switches, programmable keys.", price=129.99, image_url="https://via.placeholder.com/800x800/1e293b/ffffff?text=Keyboard", stock=30, category="Electronics"),
-                Product(name="Premium Gaming Headset", description="7.1 surround sound, noise cancellation.", price=89.99, image_url="https://via.placeholder.com/800x800/1e293b/ffffff?text=Headset", stock=25, category="Electronics"),
-            ]
-            for p in sample_products:
-                db.session.add(p)
-            db.session.commit()
-            print("Sample products created.")
+
 
     app.run(debug=True)
